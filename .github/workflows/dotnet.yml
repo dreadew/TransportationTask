@@ -25,6 +25,6 @@ jobs:
       run: |
         for i in {1..5}; do
           echo "Running test #$i"
-          dotnet run --project TransportationProblemSolver/TransportationProblemSolver.csproj --configuration Release --no-build -- data/in$i.txt data/out$i.txt
+          dotnet run --project TransportationTask/TransportationTask.csproj --configuration Release --no-build -- data/in$i.txt data/out$i.txt
           diff data/out$i.txt expected/out$i.txt
         done
