@@ -6,8 +6,8 @@ class Program
 {
   static async Task Main(string[] args)
   {
-    string inputFilePath = "data/in.txt";
-    string outputFilePath = "data/out.txt";
+    string inputFilePath = "data/in6.txt";
+    string outputFilePath = "data/out6.txt";
 
     if (args.Length >= 2)
     {

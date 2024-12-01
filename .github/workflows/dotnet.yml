@@ -23,7 +23,7 @@ jobs:
       run: dotnet build --no-restore --configuration Release
     - name: Run Tests
       run: |
-        for i in {1..5}; do
+        for i in {1..6}; do
           echo "Running test #$i"
           dotnet run --project TransportationTask.csproj --configuration Release --no-build -- data/in$i.txt data/out$i.txt
           diff data/out$i.txt expected/out$i.txt
