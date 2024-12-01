@@ -82,10 +82,10 @@ dotnet run --project TransportationTask.csproj
 
 ### Пример выходных данных
 ```
-220
-20 0 10
-0 30 10
-0 0 20
+330
+0 0 30
+10 30 0
+10 0 10
 ```
 
 ## CI/CD Конвейер
