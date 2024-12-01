@@ -1,4 +1,4 @@
-using TransportationTaskSolver;
+using TransportationProblem;
 
 namespace Optimizers;
 

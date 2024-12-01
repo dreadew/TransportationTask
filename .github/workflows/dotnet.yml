@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build_and_test:
 
     runs-on: ubuntu-latest
 
@@ -20,8 +20,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: Benchmark
-      run: dotnet run -c Release
+      run: dotnet build --no-restore --configuration Release
+    - name: Run Tests
+      run: |
+        for i in {1..5}; do
+          echo "Running test #$i"
+          dotnet run --project TransportationProblemSolver/TransportationProblemSolver.csproj --configuration Release --no-build -- data/in$i.txt data/out$i.txt
+          diff data/out$i.txt expected/out$i.txt
+        done

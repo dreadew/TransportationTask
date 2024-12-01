@@ -1,3 +1,5 @@
+using TransportationProblem;
+
 namespace TransportationTaskSolver;
 
 interface ITransportationTaskSolver
@@ -68,3 +70,75 @@ class LeastCostMethod : ITransportationTaskSolver
   }
 }
 
+class VogelsApproximationMethod : ITransportationTaskSolver
+{
+  public Task<int[,]> SolveAsync(TransportationTask problem)
+  {
+    return Task.Run(() =>
+    {
+      int N = problem.N;
+      int M = problem.M;
+      int[,] X = new int[N, M];
+      int[] supply = (int[])problem.Supplies.Clone();
+      int[] demand = (int[])problem.Demands.Clone();
+      bool[] rowDone = new bool[N];
+      bool[] colDone = new bool[M];
+
+      while (supply.Any(s => s > 0) && demand.Any(d => d > 0))
+      {
+        int[] rowPenalties = new int[N];
+        int[] colPenalties = new int[M];
+
+        Parallel.For(0, N, i =>
+                {
+                  if (!rowDone[i])
+                  {
+                    var costs = Enumerable.Range(0, M).Where(j => !colDone[j]).Select(j => problem.Costs[i, j]).OrderBy(c => c).Take(2).ToArray();
+                    rowPenalties[i] = costs.Length > 1 ? costs[1] - costs[0] : costs[0];
+                  }
+                });
+
+        Parallel.For(0, M, j =>
+                {
+                  if (!colDone[j])
+                  {
+                    var costs = Enumerable.Range(0, N).Where(i => !rowDone[i]).Select(i => problem.Costs[i, j]).OrderBy(c => c).Take(2).ToArray();
+                    colPenalties[j] = costs.Length > 1 ? costs[1] - costs[0] : costs[0];
+                  }
+                });
+
+        int maxRowPenalty = rowPenalties.Max();
+        int maxColPenalty = colPenalties.Max();
+
+        if (maxRowPenalty >= maxColPenalty)
+        {
+          int i = Array.IndexOf(rowPenalties, maxRowPenalty);
+          var minCost = Enumerable.Range(0, M).Where(j => !colDone[j]).OrderBy(j => problem.Costs[i, j]).First();
+          int j = minCost;
+          int quantity = Math.Min(supply[i], demand[j]);
+          X[i, j] = quantity;
+          supply[i] -= quantity;
+          demand[j] -= quantity;
+
+          if (supply[i] == 0) rowDone[i] = true;
+          if (demand[j] == 0) colDone[j] = true;
+        }
+        else
+        {
+          int j = Array.IndexOf(colPenalties, maxColPenalty);
+          var minCost = Enumerable.Range(0, N).Where(i => !rowDone[i]).OrderBy(i => problem.Costs[i, j]).First();
+          int i = minCost;
+          int quantity = Math.Min(supply[i], demand[j]);
+          X[i, j] = quantity;
+          supply[i] -= quantity;
+          demand[j] -= quantity;
+
+          if (supply[i] == 0) rowDone[i] = true;
+          if (demand[j] == 0) colDone[j] = true;
+        }
+      }
+
+      return X;
+    });
+  }
+}

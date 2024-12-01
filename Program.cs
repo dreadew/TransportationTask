@@ -1,17 +1,31 @@
 ﻿using Optimizers;
+using TransportationProblem;
 using TransportationTaskSolver;
 
 class Program
 {
-  const string inputFilePath = "data/in.txt";
-  const string outputFilePath = "data/out.txt";
   static async Task Main(string[] args)
   {
+    string inputFilePath = "data/in.txt";
+    string outputFilePath = "data/out.txt";
+
+    if (args.Length >= 2)
+    {
+      inputFilePath = args[0];
+      outputFilePath = args[1];
+    }
+    else if (args.Length == 1)
+    {
+      inputFilePath = args[0];
+      outputFilePath = "data/out.txt";
+    }
+
     TransportationTask task = await TransportationTask.LoadFromFileAsync(inputFilePath);
     List<ITransportationTaskSolver> solvers = new List<ITransportationTaskSolver>()
     {
       new NorthwestCornerMethod(),
-      new LeastCostMethod()
+      new LeastCostMethod(),
+      new VogelsApproximationMethod()
     };
 
     List<Task<(int[,], int)>> tasks = new List<Task<(int[,], int)>>();

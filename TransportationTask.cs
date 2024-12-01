@@ -1,4 +1,4 @@
-namespace TransportationTaskSolver;
+namespace TransportationProblem;
 
 class TransportationTask
 {
